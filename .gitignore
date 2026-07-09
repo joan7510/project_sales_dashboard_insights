@@ -1,0 +1,42 @@
+# macOS and editor files
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Python cache and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Raw/source data and derived datasets
+alphago_fitness/
+combined_data/
+python_data/
+*.csv
+*.pkl
+*.xlsx
+*.xls
+*.numbers
+
+# Generated reports and exports
+reports/*.html
+reports/*.pdf
+reports/*.png
+reports/*.jpg
+reports/*.jpeg
+reports/*.csv
+reports/*.xlsx
+
+# Local cleanup logs and generated working files
+phase*_cleanup_log.txt
+*.log
+
+# Keep lightweight report notes if needed
+!reports/README.txt
