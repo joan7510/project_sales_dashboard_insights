@@ -69,11 +69,15 @@ git commit -m "Initial dashboard analysis code"
 
 ## 6. Connect To GitHub
 
-Create an empty GitHub repository first, then replace `YOUR_GITHUB_REPO_URL` below.
+GitHub repository:
+
+```text
+https://github.com/joan7510/project_sales_dashboard_insights.git
+```
 
 ```bash
 git branch -M main
-git remote add origin YOUR_GITHUB_REPO_URL
+git remote add origin https://github.com/joan7510/project_sales_dashboard_insights.git
 git push -u origin main
 ```
 
