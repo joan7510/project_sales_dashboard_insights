@@ -336,6 +336,208 @@ python3 -m playwright install chromium
 
 Then regenerate the PDF from `reports/orders_payment_dashboard.html`.
 
+## Unsuccessful Sales Dashboard
+
+Generate this dashboard as a separate report:
+
+- HTML dashboard: `reports/unpaid_unfulfilled_sales_dashboard.html`
+
+This dashboard focuses on sales that may need operational follow-up because they are unpaid, refunded/partially refunded/pending, unfulfilled, partially fulfilled, or both non-paid and unfulfilled.
+
+### Definition: Unsuccessful Sales
+
+Use the term `Unsuccessful Sales`, not `Attention Sales`.
+
+Define unsuccessful rows as:
+
+```text
+Financial Status != paid
+OR
+Fulfillment Status != fulfilled
+```
+
+This means the unsuccessful-sales total includes:
+
+- non-paid sales
+- unfulfilled or partially fulfilled sales
+- the overlap where a row is both non-paid and unfulfilled
+
+Do not double-count the overlap in the total unsuccessful-sales KPI.
+
+### Line-Item Sales Amount
+
+For this dashboard, calculate sales at line-item level:
+
+```text
+Lineitem quantity * Lineitem price
+```
+
+Use this formula for:
+
+- unsuccessful sales
+- non-paid sales
+- unfulfilled sales
+- both non-paid and unfulfilled sales
+- total line-item sales
+- unsuccessful sales rate
+- top unsuccessful products
+
+### Status Forward-Fill Rule
+
+The cleaned Shopify export contains continuation line-item rows where order-level fields are blank.
+
+Before filtering, forward-fill these order-level fields from the previous populated order row:
+
+- `financial_year`
+- `Financial Status`
+- `Fulfillment Status`
+- `Created at`
+- `Accepts Marketing`
+- `Shipping Province`
+- `Billing Province`
+
+This keeps each line item attached to the correct order status.
+
+### KPI Cards
+
+The current KPI cards are:
+
+1. `Unsuccessful Sales`
+   - value: `$137,285.29`
+   - year-over-year change: `+45.6% YoY`
+2. `Unsuccessful Rate`
+   - value: `6.6%`
+   - note: `5.4% to 7.7% by year`
+3. `Non-Paid Sales`
+   - value: `$102,231.01`
+   - year-over-year change: `-16.5% YoY`
+4. `Unfulfilled Sales`
+   - value: `$77,420.54`
+   - year-over-year change: `+177.9% YoY`
+5. `Both Non-Paid And Unfulfilled`
+   - value: `$42,366.26`
+   - year-over-year change: `+8.5% YoY`
+
+### Unsuccessful Sales Rate
+
+Calculate the unsuccessful sales rate as:
+
+```text
+unsuccessful line-item sales / total line-item sales
+```
+
+Current validated result:
+
+| financial_year | unsuccessful sales | total line-item sales | unsuccessful rate |
+|---|---:|---:|---:|
+| 24-25 | 55,886.82 | 1,028,186.37 | 5.4% |
+| 25-26 | 81,398.47 | 1,063,666.22 | 7.7% |
+| combined | 137,285.29 | 2,091,852.59 | 6.6% |
+
+### Year Comparison Values
+
+Current validated result:
+
+| Metric | FY24-25 | FY25-26 | Difference | YoY change |
+|---|---:|---:|---:|---:|
+| Unsuccessful sales | 55,886.82 | 81,398.47 | 25,511.65 | 45.6% |
+| Non-paid sales | 55,717.82 | 46,513.19 | -9,204.63 | -16.5% |
+| Unfulfilled sales | 20,489.37 | 56,931.17 | 36,441.80 | 177.9% |
+| Both non-paid and unfulfilled | 20,320.37 | 22,045.89 | 1,725.52 | 8.5% |
+
+### Non-Paid Sales By Payment Status
+
+Filter:
+
+```text
+Financial Status != paid
+```
+
+Group by:
+
+- `financial_year`
+- `Financial Status`
+
+Current validated result:
+
+| Financial Status | FY24-25 sales | FY25-26 sales | Difference |
+|---|---:|---:|---:|
+| partially_refunded | 36,621.35 | 23,915.50 | -12,705.85 |
+| refunded | 19,096.47 | 22,032.69 | 2,936.22 |
+| pending | 0.00 | 565.00 | 565.00 |
+
+### Unfulfilled Sales By Fulfillment Status
+
+Filter:
+
+```text
+Fulfillment Status != fulfilled
+```
+
+Group by:
+
+- `financial_year`
+- `Fulfillment Status`
+
+Current validated result:
+
+| Fulfillment Status | FY24-25 sales | FY25-26 sales | Difference |
+|---|---:|---:|---:|
+| unfulfilled | 20,489.37 | 48,454.27 | 27,964.90 |
+| partial | 0.00 | 8,476.90 | 8,476.90 |
+
+### Top Unsuccessful Products
+
+Filter:
+
+```text
+Financial Status != paid
+OR
+Fulfillment Status != fulfilled
+```
+
+Group by:
+
+- `Lineitem name`
+
+Calculate:
+
+- sum of `Lineitem quantity`
+- sum of line-item sales
+
+Current top products by unsuccessful sales:
+
+| Product | quantity | unsuccessful sales |
+|---|---:|---:|
+| Multi-Functional Smith Machine JL006 | 6 | 10,979.07 |
+| Alphago 5-In-1 Multi-Functional Smith Machine US586 | 2 | 7,897.44 |
+| Ultimate Counterbalanced Smith Machine BL181 | 2 | 6,560.49 |
+| Smith Machine JL006 + 2.2m Bar + Weights + Bench - 150kg Bumper Plates + Incline Bench TB-44 | 2 | 5,856.00 |
+| Smith Machine BL181 All-in-One Premium Gym Set | 1 | 4,732.00 |
+
+### Dashboard Sections
+
+The unsuccessful-sales dashboard should include:
+
+1. Header
+2. KPI cards
+3. Year Comparison
+4. Non-Paid Sales By Payment Status
+5. Unfulfilled Sales By Fulfillment Status
+6. Top Unsuccessful Products
+7. Insight Summary
+
+### Insight Summary To Include
+
+Current insights:
+
+- Unsuccessful sales increased by `$25,511.65`, from `$55,886.82` in FY24-25 to `$81,398.47` in FY25-26, a `45.6%` increase.
+- Unsuccessful sales represent `6.6%` of total line-item sales across both years, rising from `5.4%` in FY24-25 to `7.7%` in FY25-26.
+- Non-paid line-item sales decreased by `$9,204.63`, or `16.5%`, but unfulfilled line-item sales increased by `$36,441.80`, or `177.9%`.
+- FY25-26 has `185` unfulfilled or partially fulfilled line rows, compared with `40` in FY24-25.
+- The overlap of non-paid and unfulfilled sales is `$42,366.26`, with FY25-26 slightly higher by `$1,725.52`.
+- The highest-value unsuccessful product is `Multi-Functional Smith Machine JL006`, contributing `$10,979.07`.
+
 ## Regeneration Checklist
 
 Follow this checklist whenever regenerating the report:
@@ -350,6 +552,17 @@ Follow this checklist whenever regenerating the report:
 8. Regenerate `reports/orders_payment_dashboard.pdf` from the HTML.
 9. Verify the HTML and PDF both exist.
 10. Verify the removed sections are not present unless intentionally re-added.
+
+For the unsuccessful-sales dashboard:
+
+1. Start from `combined_orders_24-26_cleaned.csv`.
+2. Forward-fill the order-level fields listed above.
+3. Calculate line-item sales as `Lineitem quantity * Lineitem price`.
+4. Recalculate unsuccessful, non-paid, unfulfilled, and overlap metrics.
+5. Recalculate unsuccessful rate as unsuccessful sales divided by total line-item sales.
+6. Update `reports/unpaid_unfulfilled_sales_dashboard.html`.
+7. Verify the dashboard contains no `Attention Sales` wording.
+8. Verify the dashboard includes `Unsuccessful Sales`, `Unsuccessful Rate`, YoY KPI changes, and the insight summary.
 
 ## Notes For Future Changes
 
